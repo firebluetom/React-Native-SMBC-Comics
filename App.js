@@ -13,8 +13,10 @@ export default class App extends Component {
   }
 
   componentDidMount() {
-    this.eventListener = DeviceEventEmitter.addListener('refresh', () => {
-      this.forceUpdate();
+    this.eventListener = DeviceEventEmitter.addListener('refresh', (data) => {
+      this.setState({
+        data
+      });
     });
   }
 

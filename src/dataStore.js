@@ -38,7 +38,7 @@ const prefetchComics = async (amount = buffer) => {
 const recursiveFetch = async (url, amount) => {
     if (amount === 0) {
         isUpdating = false;
-        DeviceEventEmitter.emit('refresh');
+        DeviceEventEmitter.emit('refresh', arrayOfComics);
         return;
     }
 
@@ -46,14 +46,13 @@ const recursiveFetch = async (url, amount) => {
     prefetchIndex++;
 
     arrayOfComics[prefetchIndex] = results;
-
     return recursiveFetch(results.prev, amount - 1);
 }
 
 
 // Get Initial Data
 getInitialData().then(() => {
-    DeviceEventEmitter.emit('refresh', { name: 'John', age: 23 });
+    DeviceEventEmitter.emit('refresh', arrayOfComics);
     prefetchComics();
 });
 
