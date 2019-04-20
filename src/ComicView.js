@@ -1,7 +1,8 @@
-import React, { Component } from 'react';
-import { Button, StyleSheet, Text, View, Image, ScrollView, WebView, Dimensions } from 'react-native';
+import React, { PureComponent } from 'react';
+import { StyleSheet, View, WebView } from 'react-native';
+import { Button } from 'react-native-elements';
 
-export class ComicView extends Component {
+export class ComicView extends PureComponent {
     constructor(props) {
         super(props);
         this.state = {
@@ -36,13 +37,15 @@ export class ComicView extends Component {
         return (
             <View style={styles.webViewContainer}>
                 <WebView
+                    style={styles.webview}
                     source={{ html: contents }}
                     scalesPageToFit={true}
                 />
                 <Button
                     onPress={this.toggleComic}
                     title="Toggle"
-                    style={styles.button}
+                    buttonStyle={styles.button}
+
                 />
             </View>
         )
@@ -53,14 +56,17 @@ export class ComicView extends Component {
 const styles = StyleSheet.create({
     webViewContainer: {
         flexGrow: 1,
-        width: '90%',
         flex: 1,
-        marginLeft: '5%',
-        marginRight: '5%'
+    },
+    webview: {
+        
     },
     button: {
         borderRadius: 100,
         borderWidth: 1,
-        borderColor: '#fff',
+        borderColor: 'red',
+        backgroundColor: 'red',
+        width: '100%',
+        height: 50,
     }
 });

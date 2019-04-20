@@ -1,7 +1,9 @@
 import React, { Component } from 'react';
-import { Button, StyleSheet, Text, View, Image, ScrollView, WebView, Dimensions } from 'react-native';
+import { Button, StyleSheet, Text, View, Image, ScrollView, WebView, Dimensions, DeviceEventEmitter } from 'react-native';
 import { ComicView } from './src/ComicView';
 import { arrayOfComics, getInitialData, prefetchComics, getIndex, setIndex } from './src/dataStore';
+import Carousel from 'react-native-snap-carousel';
+import Store from './src/Store';
 
 export default class App extends Component {
   constructor() {
@@ -13,6 +15,10 @@ export default class App extends Component {
   }
 
   componentDidMount() {
+    this.eventListener = DeviceEventEmitter.addListener('refresh', () => {
+      this.forceUpdate();
+    });
+
     getInitialData()
       .then(() => {
         this.setState({
@@ -37,44 +43,31 @@ export default class App extends Component {
     });
   }
 
-  render() {
-    const { isLoading, next, prev, data } = this.state;
-    let src, title, afterComic;
-    const index = getIndex();
+  _renderItem({ item, index }) {
+    // console.log(item);
+    const { src, title, afterComic } = item;
+    return (
+      <ComicView src={src} title={title} afterComic={afterComic} />
+    );
+  }
 
-    if (data[index]) {
-       ({ src, title, afterComic } = data[index]);
-    }
+  render() {
+    const { isLoading, data } = this.state;
+    const index = getIndex();
 
     return (
       <View style={styles.container}>
         {isLoading && <Text>Loading</Text>}
         {!isLoading &&
-          <View style={{ display: 'flex', flex: 1, flexDirection: 'column' }}>
-
-            <ComicView src={src} title={title} afterComic={afterComic} />
-          
-            <View style={styles.buttonContainer}>
-              <View style={styles.button}>
-                <Button
-                  onPress={() => { this.switchComics(index + 1) }}
-                  title="<"
-                  color="orange"
-                  accessibilityLabel="Back"
-                />
-              </View>
-              
-              {index > 0 && <View style={styles.button}>
-                <Button
-                  onPress={() => { this.switchComics(index - 1) }}
-                  title=">"
-                  color="orange"
-                  accessibilityLabel="Forward"
-                />
-              </View>
-              }
-            </View>
-          </View>
+            <Carousel
+              ref={(c) => { this._carousel = c; }}
+              data={data}
+              renderItem={this._renderItem}
+              sliderWidth={Dimensions.get('window').width}
+              itemWidth={Dimensions.get('window').width - 50}
+              layout="default"
+              onSnapToItem={setIndex}
+            />
         }
       </View>
     );

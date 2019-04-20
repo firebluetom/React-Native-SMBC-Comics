@@ -1,9 +1,11 @@
 import { getImageDetailsAtUrl } from './getImageDetailsAtUrl';
+import { DeviceEventEmitter } from 'react-native';
 
 const arrayOfComics = [];
 let index = 0;
 let prefetchIndex = 0;
 let buffer = 5;
+let isUpdating = false;
 
 export const getIndex = () => index;
 export const setIndex = (idx) => { 
@@ -24,24 +26,31 @@ const getInitialData = async () => {
     arrayOfComics.push(results);
 }
 
-const getComicAtIndex = (index) => {
-    return arrayOfComics[index];
-}
-
-const prefetchComics = (amount = buffer) => {
-    recursiveFetch(arrayOfComics[prefetchIndex].prev, amount);
+const prefetchComics = async (amount = buffer) => {
+    if (isUpdating) {
+        return;
+    } else {
+        isUpdating = true;
+        return await recursiveFetch(arrayOfComics[prefetchIndex].prev, amount);
+    }
 }
 
 const recursiveFetch = async (url, amount) => {
     if (amount === 0) {
+        isUpdating = false;
+        DeviceEventEmitter.emit('refresh', { name: 'John', age: 23 });
         return;
     }
+
     const results = await getImageDetailsAtUrl(url);
     prefetchIndex++;
+    
+    // console.log(prefetchIndex, url);
+
     arrayOfComics[prefetchIndex] = results;
 
     // console.log(prefetchIndex, arrayOfComics[prefetchIndex]);
-    recursiveFetch(results.prev, amount - 1);
+    return recursiveFetch(results.prev, amount - 1);
 }
 
 export {
