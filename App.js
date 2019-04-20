@@ -14,8 +14,6 @@ export default class App extends Component {
 
   componentDidMount() {
     this.eventListener = DeviceEventEmitter.addListener('refresh', (data) => {
-      console.log('refresh');
-
       this.setState({
         data
       });

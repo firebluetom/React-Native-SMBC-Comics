@@ -65,7 +65,7 @@ getInitialData().then(() => {
 });
 
 
-const _storeData = async (key, value) => {
+const _storeData = (key, value) => {
     try {
         AsyncStorage.setItem(key, JSON.stringify(value));
     } catch (error) {
