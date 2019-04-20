@@ -20,7 +20,7 @@ export default class App extends Component {
     });
   }
 
-  _renderItem({ item }) {
+  _renderItem({ item, index }) {
     return (
       <ComicView {...item} />
     );

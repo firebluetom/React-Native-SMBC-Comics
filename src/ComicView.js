@@ -37,7 +37,6 @@ export class ComicView extends PureComponent {
         return (
             <View style={styles.webViewContainer}>
                 <WebView
-                    style={styles.webview}
                     source={{ html: contents }}
                     scalesPageToFit={true}
                 />
@@ -56,9 +55,6 @@ const styles = StyleSheet.create({
     webViewContainer: {
         flexGrow: 1,
         flex: 1,
-    },
-    webview: {
-        
     },
     button: {
         borderRadius: 100,
