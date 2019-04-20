@@ -10,4 +10,4 @@ A React Native App built with Expo-CLI
 3. `npm start`
 
 ## Download
-[APK](https://github.com/firebluetom/React-Native-SMBC-Comics/raw/master/smbc-comics-1218d6fc93fc41eeb8e2a0a2ae99e46d-signed.apk)
+[APK](https://github.com/firebluetom/React-Native-SMBC-Comics/raw/master/smbc-comics.apk)
