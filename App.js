@@ -1,9 +1,10 @@
 import React, { Component } from 'react';
-import { Button, StyleSheet, Text, View, Image, ScrollView } from 'react-native';
+import { Button, StyleSheet, Text, View, Image, ScrollView, WebView, Dimensions } from 'react-native';
+import { ComicView } from './src/ComicView';
 import FullWidthImage from 'react-native-fullwidth-image'
+// import { WebView } from 'react-native-webview';
 
-var DomParser = require('react-native-html-parser').DOMParser
-var HTMLParser = require('fast-html-parser');
+const HTMLParser = require('fast-html-parser');
 
 export default class App extends Component {
   constructor() {
@@ -12,7 +13,9 @@ export default class App extends Component {
       isLoading: true,
       title: null,
       src: null,
+      afterComic: null,
       prev: null,
+      data: []
     };
     this.prefetch.bind(this);
   }
@@ -23,10 +26,11 @@ export default class App extends Component {
       .then((response) => {
         var root = HTMLParser.parse(response);
 
-        let prev, next;
+        let prev, next, afterComic;
         const { src, title } = root.querySelector('#cc-comic').attributes;
         const previousButton = root.querySelector('.cc-prev');
         const nextButton = root.querySelector('.cc-next');
+        const afterComicImg = root.querySelector('#aftercomic img');
 
         if (previousButton) {
           ({ href: prev } = root.querySelector('.cc-prev').attributes);
@@ -34,12 +38,16 @@ export default class App extends Component {
         if (nextButton) {
           ({ href: next } = root.querySelector('.cc-next').attributes);
         }
+        if (afterComicImg) {
+          ({ src: afterComic } = afterComicImg.attributes);
+        }
 
         return {
           title,
           src,
           prev,
           next,
+          afterComic,
         };
 
       })
@@ -48,13 +56,10 @@ export default class App extends Component {
       });
   }
 
-  updateComponent = ({ title, src, prev, next }) => {
+  updateComponent = (props) => {
     this.setState({
       isLoading: false,
-      title,
-      src,
-      prev,
-      next,
+      ...props,
     });
   }
 
@@ -85,20 +90,14 @@ export default class App extends Component {
   }
 
   render() {
-    const { isLoading, src, title, next, prev } = this.state;
+    const { isLoading, src, title, next, prev, afterComic } = this.state;
+
     return (
       <View style={styles.container}>
         {isLoading && <Text>Loading</Text>}
         {!isLoading &&
-          <ScrollView
-            bouncesZoom={true}
-            maximumZoomScale={2.0}
-            pinchGestureEnabled={true}
-          >
-            <Text style={{ fontSize: 16 }}>{title}</Text>
-            <FullWidthImage
-              source={{ uri: src }}
-            />
+          <View style={{ display: 'flex', flex: 1, flexDirection: 'column' }}>
+            <ComicView src={src} title={title} afterComic={afterComic} />
             <View style={styles.buttonContainer}>
               {prev && <View style={styles.button}>
                 <Button
@@ -119,7 +118,7 @@ export default class App extends Component {
               </View>
               }
             </View>
-          </ScrollView>
+          </View>
         }
       </View>
     );
@@ -133,8 +132,11 @@ const styles = StyleSheet.create({
     backgroundColor: '#fff',
   },
   buttonContainer: {
-    flex: 1,
     flexDirection: 'row',
+    position: 'absolute',
+    bottom: 0,
+    left: 0,
+    right: 0
   },
   button: {
     borderStyle: 'solid',
@@ -142,5 +144,5 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderColor: '#d6d7da',
     flex: 1,
-  }
+  },
 });
