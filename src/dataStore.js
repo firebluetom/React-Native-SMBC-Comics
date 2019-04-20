@@ -38,20 +38,24 @@ const prefetchComics = async (amount = buffer) => {
 const recursiveFetch = async (url, amount) => {
     if (amount === 0) {
         isUpdating = false;
-        DeviceEventEmitter.emit('refresh', { name: 'John', age: 23 });
+        DeviceEventEmitter.emit('refresh');
         return;
     }
 
     const results = await getImageDetailsAtUrl(url);
     prefetchIndex++;
-    
-    // console.log(prefetchIndex, url);
 
     arrayOfComics[prefetchIndex] = results;
 
-    // console.log(prefetchIndex, arrayOfComics[prefetchIndex]);
     return recursiveFetch(results.prev, amount - 1);
 }
+
+
+// Get Initial Data
+getInitialData().then(() => {
+    DeviceEventEmitter.emit('refresh', { name: 'John', age: 23 });
+    prefetchComics();
+});
 
 export {
     arrayOfComics,
