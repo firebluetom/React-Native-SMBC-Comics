@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 import { StyleSheet, Text, View, Dimensions, DeviceEventEmitter } from 'react-native';
 import { ComicView } from './src/ComicView';
-import { setIndex } from './src/dataStore';
+import { setIndex, prefetchComics } from './src/dataStore';
 import Carousel from 'react-native-snap-carousel';
 
 export default class App extends Component {
@@ -14,6 +14,8 @@ export default class App extends Component {
 
   componentDidMount() {
     this.eventListener = DeviceEventEmitter.addListener('refresh', (data) => {
+      console.log('refresh');
+
       this.setState({
         data
       });
