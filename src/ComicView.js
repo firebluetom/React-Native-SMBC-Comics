@@ -19,7 +19,7 @@ export class ComicView extends PureComponent {
     }
 
     render() {
-        const { src, title, afterComic } = this.props;
+        const { src, title, afterComic, hoverText } = this.props;
         const { comicToShow } = this.state;
 
         const contents = `
@@ -30,6 +30,7 @@ export class ComicView extends PureComponent {
                 <body>
                     <h5>${title}</h5>
                     <img src="${comicToShow ? afterComic : src}" style="width: 100%;" />
+                    <h6>${hoverText}</h6>
                 </body>
             </html>
         `;
