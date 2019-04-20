@@ -1,119 +1,72 @@
 import React, { Component } from 'react';
 import { Button, StyleSheet, Text, View, Image, ScrollView, WebView, Dimensions } from 'react-native';
 import { ComicView } from './src/ComicView';
-import FullWidthImage from 'react-native-fullwidth-image'
-// import { WebView } from 'react-native-webview';
-
-const HTMLParser = require('fast-html-parser');
+import { arrayOfComics, getInitialData, prefetchComics, getIndex, setIndex } from './src/dataStore';
 
 export default class App extends Component {
   constructor() {
     super();
     this.state = {
       isLoading: true,
-      title: null,
-      src: null,
-      afterComic: null,
-      prev: null,
       data: []
     };
-    this.prefetch.bind(this);
-  }
-
-  getImageDetailsAtUrl(url) {
-    return fetch(url, { cache: "force-cache" })
-      .then((response) => response.text())
-      .then((response) => {
-        var root = HTMLParser.parse(response);
-
-        let prev, next, afterComic;
-        const { src, title } = root.querySelector('#cc-comic').attributes;
-        const previousButton = root.querySelector('.cc-prev');
-        const nextButton = root.querySelector('.cc-next');
-        const afterComicImg = root.querySelector('#aftercomic img');
-
-        if (previousButton) {
-          ({ href: prev } = root.querySelector('.cc-prev').attributes);
-        }
-        if (nextButton) {
-          ({ href: next } = root.querySelector('.cc-next').attributes);
-        }
-        if (afterComicImg) {
-          ({ src: afterComic } = afterComicImg.attributes);
-        }
-
-        return {
-          title,
-          src,
-          prev,
-          next,
-          afterComic,
-        };
-
-      })
-      .catch((error) => {
-        console.error(error);
-      });
-  }
-
-  updateComponent = (props) => {
-    const { data } = this.state;
-    data.push(props);
-    this.setState({
-      isLoading: false,
-      data,
-      ...props,
-    });
   }
 
   componentDidMount() {
-    this.switchComics('https://www.smbc-comics.com');
+    getInitialData()
+      .then(() => {
+        this.setState({
+          isLoading: false,
+          data: arrayOfComics,
+        });
+      })
+      .then(() => {
+        prefetchComics();
+      });
   }
 
-  prefetch = () => {
-    const { prev, next } = this.state;
-    if (prev) {
-      this.getImageDetailsAtUrl(prev)
-        .then(({ src }) => Image.prefetch(src));
-    }
-    if (next) {
-      this.getImageDetailsAtUrl(next)
-        .then(({ src }) => Image.prefetch(src));
-    }
-  }
-
-  switchComics = (url) => {
+  switchComics = (index) => {
     this.setState({
       isLoading: true,
     });
 
-    this.getImageDetailsAtUrl(url)
-      .then(this.updateComponent)
-      .then(this.prefetch);
+    setIndex(index).then(() => {
+      this.setState({
+        isLoading: false,
+      });
+    });
   }
 
   render() {
-    const { isLoading, src, title, next, prev, afterComic } = this.state;
+    const { isLoading, next, prev, data } = this.state;
+    let src, title, afterComic;
+    const index = getIndex();
+
+    if (data[index]) {
+       ({ src, title, afterComic } = data[index]);
+    }
 
     return (
       <View style={styles.container}>
         {isLoading && <Text>Loading</Text>}
         {!isLoading &&
           <View style={{ display: 'flex', flex: 1, flexDirection: 'column' }}>
+
             <ComicView src={src} title={title} afterComic={afterComic} />
+          
             <View style={styles.buttonContainer}>
-              {prev && <View style={styles.button}>
+              <View style={styles.button}>
                 <Button
-                  onPress={() => { this.switchComics(prev) }}
+                  onPress={() => { this.switchComics(index + 1) }}
                   title="<"
                   color="orange"
                   accessibilityLabel="Back"
                 />
               </View>
-              }
-              {next && <View style={styles.button}>
+              
+              {index > 0 && <View style={styles.button}>
                 <Button
-                  onPress={() => { this.switchComics(next) }}
+                  onPress={() => { this.switchComics(index - 1) }}
                   title=">"
                   color="orange"
                   accessibilityLabel="Forward"
@@ -136,11 +89,6 @@ const styles = StyleSheet.create({
   },
   buttonContainer: {
     flexDirection: 'row',
-    
-    // position: 'absolute',
-    // bottom: 0,
-    // left: 0,
-    // right: 0
   },
   button: {
     borderStyle: 'solid',
