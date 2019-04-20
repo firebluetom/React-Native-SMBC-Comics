@@ -1,14 +1,14 @@
 import React, { Component } from 'react';
 import { StyleSheet, Text, View, Dimensions, DeviceEventEmitter } from 'react-native';
 import { ComicView } from './src/ComicView';
-import { arrayOfComics, setIndex } from './src/dataStore';
+import { setIndex } from './src/dataStore';
 import Carousel from 'react-native-snap-carousel';
 
 export default class App extends Component {
   constructor() {
     super();
     this.state = {
-      data: arrayOfComics
+      data: []
     };
   }
 
