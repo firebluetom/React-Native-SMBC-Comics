@@ -57,8 +57,11 @@ export default class App extends Component {
   }
 
   updateComponent = (props) => {
+    const { data } = this.state;
+    data.push(props);
     this.setState({
       isLoading: false,
+      data,
       ...props,
     });
   }
@@ -133,10 +136,11 @@ const styles = StyleSheet.create({
   },
   buttonContainer: {
     flexDirection: 'row',
-    position: 'absolute',
-    bottom: 0,
-    left: 0,
-    right: 0
+    
+    // position: 'absolute',
+    // bottom: 0,
+    // left: 0,
+    // right: 0
   },
   button: {
     borderStyle: 'solid',
